@@ -137,6 +137,13 @@ else # Default
         export XILINX_BOARD_PART=xilinx.com:kr260_som:part0:1.1
         export XILINX_HW_DEVICE=xck26_0
         export BOARD=KR260-PL-Only-Master
+    
+    elif [[ ${BOARD_CONFIG} == "zcu102_pl_only" ]]; then
+        # ZCU-102 (Zynq-Ultrascale+ MpSoC, PL-only)
+        export XILINX_PART_NUMBER=xczu9eg-ffvb1156-2-e
+        export XILINX_BOARD_PART=xilinx.com:zcu102:part0:3.4
+        export XILINX_HW_DEVICE=xczu9_0
+        export BOARD=zcu102-PL-Only-Master
 
     else # Default
         # Nexsys A7-100T

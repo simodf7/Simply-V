@@ -81,10 +81,18 @@ module simplyv (
 
     `ifdef EMBEDDED
         // Clock and reset
-        input logic sys_clock_i,
+        
+        // Differential Clock 
+        `ifdef HAS_DIFF_CLK
+              input logic sys_clock_p_i, 
+              input logic sys_clock_n_i, 
+        `else
+              input logic sys_clock_i,
+        `endif
+
         `ifndef ZYNQ
         // On Zynq the reset comes from the PS (FCLK_RESET0_N), not from a button
-        input logic sys_reset_i,
+              input logic sys_reset_i,
         `endif
 
         // UART interface
@@ -295,7 +303,12 @@ module simplyv (
         .LOCAL_ID_WIDTH     ( MBUS_ID_WIDTH   )
     ) sys_master_u (
         // EMBEDDED ONLY
+`ifdef HAS_DIFF_CLK
+        .sys_clock_p_i(sys_clock_p_i), 
+        .sys_clock_n_i(sys_clock_n_i), 
+`else
         .sys_clock_i(sys_clock_i),
+`endif
         .sys_reset_i(sys_reset_i),
         // HPC ONLY
         .pcie_refclk_p_i(pcie_refclk_p_i),

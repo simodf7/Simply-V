@@ -43,7 +43,8 @@ foreach clock_domain $clock_domain_list {
 
 # Clock wizard with 125 MHz input
 # TODO55: quick workaround, only the Pynq-Z1 PL-only board has a 125 MHz input clock
-if { "$::env(BOARD)" == "Pynq-Z1-PL-Only-Master" } {
+# the workaround is used also for zcu102
+if { "$::env(BOARD)" in {"Pynq-Z1-PL-Only-Master", "zcu102-PL-Only-Master"} } {
     lappend verilog_defines CLK_WIZ_125=1
 }
 
@@ -52,6 +53,14 @@ if { "$::env(BOARD)" == "Pynq-Z1-PL-Only-Master" } {
 if { "$::env(BOARD)" == "KR260-PL-Only-Master" } {
     lappend verilog_defines CLK_WIZ_25=1
 }
+
+# Notice in zcu102 board the 125Mhz Clock is differential so another workaround
+# is needed for adapting the top-level entity interface
+if { "$::env(BOARD)" == "zcu102-PL-Only-Master" } {
+    lappend verilog_defines HAS_DIFF_CLK=1
+}
+
+
 
 # Info
 puts "\[INFO\] Verilog defines: $verilog_defines"
