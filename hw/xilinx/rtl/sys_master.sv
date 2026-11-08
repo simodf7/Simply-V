@@ -48,6 +48,10 @@ module sys_master # (
 
     // EMBEDDED ONLY
     // Input clock and reset
+    // Added differential clock input
+    input logic sys_clock_p_i, 
+    input logic sys_clock_n_i, 
+    
     input logic sys_clock_i,
     input logic sys_reset_i,
 
@@ -489,6 +493,21 @@ module sys_master # (
     assign m_axi_awregion = '0;
     assign m_axi_arregion = '0;
 
+    // ADD: Buffer diff-to-single-end for the differential clock input (zcu102) 
+    
+    logic sys_clock;  
+
+`ifdef HAS_DIFF_CLK
+    IBUFDS ibufds_sys_clock_u (
+        .I  ( sys_clock_p_i ),
+        .IB ( sys_clock_n_i ),
+        .O  ( sys_clock     )
+    );
+`else
+    assign sys_clock = sys_clock_i; 
+`endif
+
+
     // PLL
 `ifdef CLK_WIZ_125
     // Board with a 125 MHz input clock
@@ -497,7 +516,7 @@ module sys_master # (
     // Board with a 100 MHz input clock
     xlnx_clk_wiz clkwiz_u (
 `endif
-        .clk_in1  ( sys_clock_i  ),
+        .clk_in1  ( sys_clock    ),
         .resetn   ( ~sys_reset_i ),
         .locked   ( locked       ),
         .clk_100  ( clk_100MHz_o ),

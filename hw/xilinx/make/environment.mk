@@ -53,8 +53,11 @@ endif
 
 # Remove the 125 MHz clock wizard when the board is not the Pynq-Z1 PL-only
 # TODO55: quick workaround, this IP is only used with the Pynq-Z1 PL-only board
+# Also used in Zcu102
 ifneq (${BOARD},Pynq-Z1-PL-Only-Master)
+ifneq (${BOARD},zcu102-PL-Only-Master)
     IP_LIST := $(filter-out xlnx_clk_wiz_125,${IP_LIST})
+endif
 endif
 
 # List of IPs' xci files to import in main Vivado project
