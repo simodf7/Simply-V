@@ -47,7 +47,7 @@ endif
 # TODO55: quick workaround for PR 146, extend this for all selectable IPs
 ifeq ($(shell [ ${XILINX_VIVADO_VERSION} -lt 2024 ] && echo true),true)
     FILTER_IP    = xlnx_microblazev_rv32 xlnx_microblazev_rv64 xlnx_microblaze_debug_module_v xlnx_dual_microblaze_debug_module_v
-    TMP_IP_LIST  = ${IP_LIST}
+    TMP_IP_LIST  := ${IP_LIST}
     IP_LIST      = $(filter-out ${FILTER_IP},${TMP_IP_LIST})
 endif
 

@@ -495,16 +495,30 @@ module sys_master # (
 
     // ADD: Buffer diff-to-single-end for the differential clock input (zcu102) 
     
-    logic sys_clock;  
+    logic sys_clock; 
+    logic sys_clock_ibuf;  
 
 `ifdef HAS_DIFF_CLK
     IBUFDS ibufds_sys_clock_u (
         .I  ( sys_clock_p_i ),
         .IB ( sys_clock_n_i ),
-        .O  ( sys_clock     )
+        .O  ( sys_clock_ibuf )
     );
 `else
-    assign sys_clock = sys_clock_i; 
+    assign sys_clock_ibuf = sys_clock_i; 
+`endif
+
+
+    // ADD: Global clock buffer needed when we use a HDGC pin 
+    // as it cannot be routed to a MMCM/PLL directly 
+
+`ifdef HAS_HDGC_CLK
+    BUFG bufg_u (
+        .I (sys_clock_ibuf),
+        .O (sys_clock)  
+    );
+`else
+    assign sys_clock = sys_clock_ibuf; 
 `endif
 
 
