@@ -16,8 +16,10 @@ VX_TOOLDIR  ?= $(VORTEX_ROOT)/tools
 
 all: bare
 
-pull: 
-	git -C $(SIMPLYV_ROOT_DIR) submodule update --init $(VORTEX_DIR)
+pull: $(VORTEX_DIR)
+
+$(VORTEX_DIR)/configure: 
+	git -C $(SIMPLYV_ROOT_DIR) submodule update --init -depth 1 $(VORTEX_DIR)
 
 toolchain: pull $(VX_TOOLDIR)/.installed
 	
@@ -29,7 +31,7 @@ $(VX_TOOLDIR)/.installed:
 
 install: toolchain 
 	mkdir -p $(PLATFORM_DIR)
-	cp simplyv/platform.mk simplyv/hal.c $(PLATFORM_DIR)
+	cp src/platform.mk src/hal.c $(PLATFORM_DIR)
 	cp $(SW_SOC_ROOT)/common/ld/variables.ld $(PLATFORM_DIR)
 	cp $(SW_SOC_ROOT)/common/ld/memory.ld $(PLATFORM_DIR)
 	cp $(SW_SOC_ROOT)/common/ld/sections.ld $(PLATFORM_DIR)
@@ -38,7 +40,7 @@ install: toolchain
 bare: install
 	cd $(BUILD_DIR) && ../configure --xlen=64 --tooldir=$(VX_TOOLDIR) && \
   . ./ci/toolchain_env.sh && \
-	$(MAKE) -C $(BUILD_DIR)/$(ZCU_PATH) bare-sw $(VX_FLAGS)
+	$(MAKE) -C $(BUILD_DIR)/$(ZCU_PATH) bare $(VX_FLAGS)
 	mkdir -p $(BIN_DIR)
 	mv $(BUILD_DIR)/$(ZCU_PATH)/bare/app.elf $(BIN_DIR)
 
