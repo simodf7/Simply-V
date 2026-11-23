@@ -19,6 +19,7 @@ set src_file_list [ list \
     $::env(XILINX_ROOT)/rtl/wrappers/plic_wrapper.sv                              \
     $::env(XILINX_ROOT)/rtl/wrappers/clint_wrapper.sv                             \
     $::env(XILINX_ROOT)/rtl/wrappers/uart_wrapper.sv                              \
+    $::env(XILINX_ROOT)/rtl/wrappers/vortex_wrapper.sv                            \
     $::env(XILINX_ROOT)/rtl/hbus.sv                                               \
     $::env(XILINX_ROOT)/rtl/pbus.sv                                               \
     $::env(XILINX_ROOT)/rtl/rv_socket.sv                                          \

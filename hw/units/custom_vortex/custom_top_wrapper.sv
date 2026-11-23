@@ -13,7 +13,8 @@ module custom_top_wrapper # (
     // AXI master parameters
     localparam LOCAL_AXI_DATA_WIDTH     = 512,
     localparam LOCAL_AXI_ADDR_WIDTH     = 64,
-    localparam LOCAL_AXI_ID_WIDTH       = 32,
+    // Must be set as the same value of CSV 
+    localparam LOCAL_AXI_ID_WIDTH       = 5,
     // AXI-lite slave parameters
     localparam LOCAL_AXILITE_DATA_WIDTH = 32,
     localparam LOCAL_AXILITE_ADDR_WIDTH = 13
@@ -46,7 +47,7 @@ module custom_top_wrapper # (
     vortex_sys vortex_sys_u(
           .aclk    (clk_i),  
           .aresetn (rst_ni), 
-          .uart_tx (uart_tx_0), 
+          .uart_tx (uart_tx_o), 
           // AXI master
           .M_AXI_VORTEX_araddr(m_vortex_axi_awradd),
           .M_AXI_VORTEX_arburst(m_vortex_axi_arburst),

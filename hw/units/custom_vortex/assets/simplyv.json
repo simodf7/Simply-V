@@ -20,9 +20,9 @@
         "TCU": false
     },
     "global_mem": "bram",
-    "mem_base": "0x400000000",
+    "mem_base": "0x8200000",
     "mem_size": "0x200000",
-    "io_base": "0xA0000000",
+    "io_base": "0x8000000",
     "kernel_size": "0x20000",
     "guard_size": "0x2000",
     "dcr_size": "0x1000",

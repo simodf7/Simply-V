@@ -66,6 +66,12 @@ if { "$::env(BOARD)" == "zcu102-PL-Only-Master" } {
     lappend verilog_defines HAS_HDGC_CLK=1
 }
 
+# Vortex GPGPU is supported only in zcu102
+if { "$::env(BOARD)" == "zcu102-PL-Only-Master" } {
+    lappend verilog_defines HAS_VORTEX=1
+}
+
+
 
 # Info
 puts "\[INFO\] Verilog defines: $verilog_defines"

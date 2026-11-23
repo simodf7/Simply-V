@@ -19,6 +19,7 @@ from peripherals.plic import PLIC
 from peripherals.clint import CLINT
 from peripherals.cdma import CDMA
 from peripherals.psddr import PSDDR
+from peripherals.vortex import VORTEX
 from general.addr_range import Addr_Ranges
 from general.error import Unsupported_Value_Error, Conflict_Error
 
@@ -47,6 +48,7 @@ class Peripherals_Factory(Factory):
 			"CDMA":       CDMA,
 			"PSDDR":      PSDDR,
 			"HBM":        HBM,
+      "VORTEX":     VORTEX,
 		}
 
 	# Extract DDR4 channel number (assuming the format is something like DDR4_CH_0)

@@ -15,11 +15,11 @@ RTL_DIR=${IP_DIR}/rtl
 mkdir -p ${RTL_DIR} 
 
 # Create tcl dir 
-TCL_DIR=${IP_DIR}/tcl 
+TCL_DIR=${RTL_DIR}/tcl 
 mkdir -p ${TCL_DIR}
 
 # Create tool dir
-VX_TOOLDIR=${IP_DIR}/tools
+VX_TOOLDIR=${RTL_DIR}/tools
 mkdir -p ${VX_TOOLDIR}
 
 PRJ_DIR=vx_subsys_prj
@@ -53,9 +53,11 @@ done
 GIT_URL=https://github.com/simodf7/vortex.git
 #GIT_URL=file:///home/simo/tesi/vortex
 GIT_BRANCH=simply-v
-CLONE_DIR=vortex
+CLONE_DIR=${RTL_DIR}/vortex
 BOARD_DIR=hw/syn/xilinx/zcu102
 
+
+cd ${RTL_DIR}; 
 printf "${YELLOW}[FETCH_SOURCES $IP_NAME] Cloning source repository${NC}\n"
 git clone ${GIT_URL} -b ${GIT_BRANCH} --depth 1 ${CLONE_DIR}
 cd ${CLONE_DIR};
@@ -80,16 +82,23 @@ cp ${CLONE_DIR}/${BOARD_DIR}/tcl/vortex_subsystem_bd.tcl ${TCL_DIR}
 cp ${CLONE_DIR}/${BOARD_DIR}/tcl/import_ip.tcl ${TCL_DIR} 
 cp ${CLONE_DIR}/hw/scripts/parse_vcs_list.tcl ${TCL_DIR}
 cp ${CLONE_DIR}/hw/scripts/xilinx_ip_gen.tcl ${TCL_DIR}
+cp ${CLONE_DIR}/hw/scripts/xilinx_async_bram_patch.tcl ${RTL_DIR}
+cp assets/vortex_post_synth.tcl ${RTL_DIR}
 
-export MAIN_CLOCK_FREQ_MHZ=$(grep -E '^MAIN_CLOCK_FREQ_MHZ' ${XILINX_ROOT}/make/config.mk | awk '{print $NF}')
-vivado -mode batch -source assets/build_vortex_subsys.tcl 
+cd ${RTL_DIR};
 
+CONFIG_FILE=${XILINX_ROOT}/make/config.mk
+export MBUS_ID_WIDTH=$(grep -E '^MBUS_ID_WIDTH' ${CONFIG_FILE} | awk '{print $NF}')
+export MAIN_CLOCK_FREQ_MHZ=$(grep -E '^MAIN_CLOCK_FREQ_MHZ' ${CONFIG_FILE} | awk '{print $NF}')
+vivado -mode batch -source ${IP_DIR}/assets/build_vortex_subsys.tcl 
+
+cd ${IP_DIR}; 
 # Clean 
 rm -rf ${TCL_DIR} 
 rm -rf ${CLONE_DIR}
-rm -rf ${PRJ_DIR}
+rm -rf ${RTL_DIR}/${PRJ_DIR}
 rm -rf ${VX_TOOLDIR} 
-rm -rf vivado*.log vivado*.jou .Xil
+rm -rf ${RTL_DIR}/vivado*.log ${RTL_DIR}/vivado*.jou ${RTL_DIR}/.Xil
 
 # Info
 printf "${GREEN}[FETCH_SOURCES $IP_NAME] Completed${NC}\n"

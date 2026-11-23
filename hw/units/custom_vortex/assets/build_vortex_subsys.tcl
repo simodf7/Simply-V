@@ -13,8 +13,8 @@ set_property board_part $::env(XILINX_BOARD_PART) [current_project]
 # Directories and files #
 #########################
 
-set rtl_dir [file normalize ./rtl] 
-set tcl_dir [file normalize ./tcl] 
+set rtl_dir [file normalize .] 
+set tcl_dir ${rtl_dir}/tcl 
 set user_ip_dir ${rtl_dir}/ip_repo
 set vcs_file ${rtl_dir}/sources.txt 
 
@@ -55,9 +55,8 @@ source ${tcl_dir}/import_ip.tcl
 # Create Vortex Subsystem IP #
 ##############################
 
+set axi_id_width $::env(MBUS_ID_WIDTH)
 set clk_freq_hz [expr {$::env(MAIN_CLOCK_FREQ_MHZ) * 1000000} ]
 set ip_repo_out ${rtl_dir}/vxsys_repo 
 source ${tcl_dir}/vortex_subsystem_bd.tcl
-
-
 

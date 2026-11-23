@@ -7,3 +7,7 @@
 [submodule "sw/SoC/projects/opensbi/opensbi"]
 	path = sw/SoC/projects/opensbi/opensbi
 	url = https://github.com/riscv-software-src/opensbi
+[submodule "sw/SoC/projects/vortex/vortex"]
+	path = sw/SoC/projects/vortex/vortex
+	url = https://github.com/simodf7/vortex.git
+	branch = simply-v

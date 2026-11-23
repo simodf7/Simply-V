@@ -8,6 +8,7 @@
 
 set top_module custom_top_wrapper
 set vortex_module vortex_subsystem
+set vortex_module_name vortex_sys
 
 set dir_name $::env(HW_UNITS_ROOT)/$::env(IP_NAME)
 set rtl_dir_name ${dir_name}/rtl
@@ -31,7 +32,7 @@ lappend ip_repos_list ${rtl_dir_name}/vxsys_repo
 set_property ip_repo_paths $ip_repos_list [current_project]
 update_ip_catalog 
 
-create_ip -vlnv user.org:user:$vortex_module:1.0
+create_ip -vlnv user.org:user:$vortex_module:1.0 -module_name $vortex_module_name
 generate_target instantiation_template [get_files $vortex_module.xci] 
 
 
@@ -60,7 +61,9 @@ update_compile_order -fileset sources_1
 set_msg_config -id {[IP_Flow 19-3833]} -suppress
 
 # Package the IP and update the catalog
-set top_repo $::env(IP_DIR)/build/ip_repo_top 
+# Package from sources_1: it contains both imports/ (wrapper, headers) and ip/ (vortex_sys),
+# so the packaged IP is self-contained (no external files)
+set top_repo $::env(IP_DIR)/build/$::env(IP_PRJ_NAME).srcs/sources_1 
 
 ipx::package_project -root_dir ${top_repo} -vendor user.org -library user -taxonomy /UserIP
 set_property name $::env(IP_PRJ_NAME) [ipx::current_core]
@@ -75,3 +78,46 @@ update_ip_catalog
 
 # Import IP into the project
 create_ip -vlnv user.org:user:$::env(IP_PRJ_NAME):1.0 -module_name $::env(IP_NAME)
+
+
+################################
+# Vortex async BRAM patch hook #
+################################
+# Vortex maps its asynchronous-read RAMs to BRAM with a netlist patch:
+# with ASYNC_BRAM_PATCH (set by VX_platform.vh for Vivado synthesis),
+# VX_dp_ram/VX_sp_ram instantiate VX_async_ram_patch, whose VX_placeholder
+# cells are left as black boxes by synth_design. The Vortex script
+# xilinx_async_bram_patch.tcl rewires the read address to its next-cycle
+# value and removes the placeholders.
+#
+# The Vortex flow runs the script before opt_design (pre_opt_hook.tcl).
+# Here the subsystem is synthesized out-of-context as a Simply-V IP, so the
+# script runs as a post-synthesis hook of this IP's synthesis run: the
+# netlist is the same (synthesized, not yet optimized), and the IP
+# checkpoint is already complete when linked into the Simply-V design.
+#
+# Workaround: the synthesis run is created by the common post_config.tcl,
+# after this script, and creating it here moves the .xci out of sources_1,
+# where post_config.tcl looks for it. Instead, create_ip_run is wrapped
+# once: the wrapper calls the original command, attaches the hook to the
+# new run and restores the original command.
+
+set ::vx_post_synth ${rtl_dir_name}/vortex_post_synth.tcl 
+add_files -fileset utils_1 -norecurse ${::vx_post_synth}
+
+rename create_ip_run vx_orig_create_ip_run
+proc create_ip_run {args} {
+    set run [vx_orig_create_ip_run {*}$args]
+    set_property STEPS.SYNTH_DESIGN.TCL.POST ${::vx_post_synth} [get_runs $::env(IP_NAME)_synth_1]
+    # One-shot wrapper: restore the original command
+    rename create_ip_run ""
+    rename vx_orig_create_ip_run create_ip_run
+    return $run
+}
+
+
+
+
+
+
+
