@@ -49,7 +49,7 @@ module custom_top_wrapper # (
           .aresetn (rst_ni), 
           .uart_tx (uart_tx_o), 
           // AXI master
-          .M_AXI_VORTEX_araddr(m_vortex_axi_awradd),
+          .M_AXI_VORTEX_araddr(m_vortex_axi_araddr),
           .M_AXI_VORTEX_arburst(m_vortex_axi_arburst),
           .M_AXI_VORTEX_arcache(m_vortex_axi_arcache),
           .M_AXI_VORTEX_arid(m_vortex_axi_arid),

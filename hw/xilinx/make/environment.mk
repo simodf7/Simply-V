@@ -75,6 +75,13 @@ ifneq (${BOARD},Pynq-Z1-Master)
     IP_LIST := $(filter-out xlnx_ps_wrapper xlnx_clk_wiz_zynq,${IP_LIST})
 endif
 
+# Remove the Vortex IPs when the board is not the ZCU102 PL-only
+# TODO55: quick workaround, these IPs are only used with the ZCU102 PL-only board
+ifneq (${BOARD},zcu102-PL-Only-Master)
+    IP_LIST := $(filter-out custom_vortex xlnx_axi_dwidth_from512_converter_vx,${IP_LIST})
+endif
+
+
 # List of IPs' xci files to import in main Vivado project
 IP_LIST_XCI = $(foreach ip,${IP_LIST},$(shell find ${XILINX_IPS_ROOT} -type f -path "*/${ip}/build/${ip}_prj.srcs/sources_1/ip/${ip}/${ip}.xci"))
 
