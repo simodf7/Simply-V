@@ -26,7 +26,7 @@ toolchain: pull $(VX_TOOLDIR)/.installed
 $(VX_TOOLDIR)/.installed: 
 	mkdir -p $(BUILD_DIR)
 	cd $(BUILD_DIR) && ../configure --xlen=64 --tooldir=$(VX_TOOLDIR) && \
-	./ci/toolchain_install.sh --riscv64 --llvm
+	./ci/toolchain_install.sh --riscv64 --llvm --libcrt64 --libc64
 	touch $@
 
 install: toolchain 
@@ -42,8 +42,9 @@ bare: install
   . ./ci/toolchain_env.sh && \
 	$(MAKE) -C $(BUILD_DIR)/$(ZCU_PATH) bare $(VX_FLAGS)
 	mkdir -p $(BIN_DIR)
-	mv $(BUILD_DIR)/$(ZCU_PATH)/bare/app.elf $(BIN_DIR)
+	cp $(BUILD_DIR)/tests/bare/$(KERNEL)/$(KERNEL) $(BIN_DIR)/$(KERNEL).elf
+	cp $(BUILD_DIR)/tests/bare/$(KERNEL)/kernel.dump $(BIN_DIR)/kernel.dump
 
 clean:
-	$(MAKE) -C $(BUILD_DIR)/$(ZCU_PATH) clean-bare-sw $(VX_FLAGS)
+	$(MAKE) -C $(BUILD_DIR)/$(ZCU_PATH) clean-bare $(VX_FLAGS)
 
