@@ -36,6 +36,62 @@ create_ip -vlnv user.org:user:$vortex_module:1.0 -module_name $vortex_module_nam
 generate_target instantiation_template [get_files $vortex_module.xci] 
 
 
+####################
+# Other IPs Needed #
+####################
+
+
+
+# AXI DWIDTH CONVERTER 64 to 32 
+
+
+if { $::env(MBUS_DATA_WIDTH) == 64 } {
+  create_ip -name axi_dwidth_converter -vendor xilinx.com -library ip -version 2.1 -module_name vx_dwidth_64_to_32
+
+  set_property -dict [list \
+    CONFIG.MI_DATA_WIDTH {32} \
+    CONFIG.SI_DATA_WIDTH {64} \
+    CONFIG.SI_ID_WIDTH $::env(MBUS_ID_WIDTH) \
+    CONFIG.ADDR_WIDTH $::env(MBUS_ADDR_WIDTH) \
+  ] [get_ips vx_dwidth_64_to_32]
+
+} 
+
+
+# AXI PROTOCOL CONVERTER AXI4 to AXILITE
+
+create_ip -name axi_protocol_converter -vendor xilinx.com -library ip -version 2.1 -module_name vx_axi4_to_axilite
+
+set_property -dict [list \
+    CONFIG.MI_PROTOCOL      {AXI4LITE} \
+    CONFIG.READ_WRITE_MODE  {READ_WRITE} \
+    CONFIG.SI_PROTOCOL      {AXI4} \
+    CONFIG.TRANSLATION_MODE {2} \
+] [get_ips vx_axi4_to_axilite]
+
+set_property CONFIG.DATA_WIDTH  32                      [get_ips vx_axi4_to_axilite]
+set_property CONFIG.ADDR_WIDTH  13                      [get_ips vx_axi4_to_axilite]
+set_property CONFIG.ID_WIDTH    $::env(MBUS_ID_WIDTH)   [get_ips vx_axi4_to_axilite]
+
+
+# AXI DATA WIDTH CONVERTER 512 to MBUS_DATA_WIDTH 
+
+create_ip -name axi_dwidth_converter -vendor xilinx.com -library ip -version 2.1 -module_name vx_dwidth_from512
+
+set_property -dict [list \
+  CONFIG.SI_DATA_WIDTH {512} \
+] [get_ips vx_dwidth_from512]
+
+# MBUS ID WIDTH is the same of VORTEX ID 
+
+set_property CONFIG.ADDR_WIDTH     $::env(MBUS_ADDR_WIDTH)  [get_ips vx_dwidth_from512]
+set_property CONFIG.SI_ID_WIDTH    $::env(MBUS_ID_WIDTH)    [get_ips vx_dwidth_from512]
+set_property CONFIG.MI_DATA_WIDTH  $::env(MBUS_DATA_WIDTH)  [get_ips vx_dwidth_from512]
+
+
+generate_target instantiation_template [get_ips vx_*]
+
+
 ###################
 # Wrapper Sources #
 ###################
@@ -78,6 +134,12 @@ update_ip_catalog
 
 # Import IP into the project
 create_ip -vlnv user.org:user:$::env(IP_PRJ_NAME):1.0 -module_name $::env(IP_NAME)
+set_property -dict [list \
+  CONFIG.LOCAL_AXI_DATA_WIDTH $::env(MBUS_DATA_WIDTH) \
+  CONFIG.LOCAL_AXI_ADDR_WIDTH $::env(MBUS_ADDR_WIDTH) \
+  CONFIG.LOCAL_AXI_ID_WIDTH   $::env(MBUS_ID_WIDTH)   \
+] [get_ips $::env(IP_NAME)]
+
 
 
 ################################
@@ -114,10 +176,4 @@ proc create_ip_run {args} {
     rename vx_orig_create_ip_run create_ip_run
     return $run
 }
-
-
-
-
-
-
 
